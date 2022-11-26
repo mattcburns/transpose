@@ -11,11 +11,16 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 )
 
+type NatsAuth struct {
+	Seed string `yaml:"seed"`
+	NKey string `yaml:"nkey"`
+}
+
 type NATSConfig struct {
-	Host    string      `yaml:"host"`
-	Auth    interface{} `yaml:"auth,omitempty"`
-	Subject string      `yaml:"subject"`
-	Types   []string    `yaml:"types,omitempty"`
+	Host    string   `yaml:"host"`
+	Auth    NatsAuth `yaml:"auth,omitempty"`
+	Subject string   `yaml:"subject"`
+	Types   []string `yaml:"types,omitempty"`
 }
 
 type TargetConfig struct {

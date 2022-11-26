@@ -1,5 +1,9 @@
 nats:
   host: example.com
   subject: exampleSubject
+  auth:
+    seed: somesecretseed
+    nkey: publicnkeyuser
 target:
   host: example.com
+  #auth: Need to look into how to handle this config, prefer jwt
