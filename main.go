@@ -95,5 +95,36 @@ func (c *Config) pushToNATS(event cloudevents.Event) {
 // Startup the NATS client to listen for incoming events
 
 func (c *Config) target() {
+	ctx := context.Background()
+
+	consumer, err := cenats.NewConsumer(c.NATS.Host, c.NATS.Subject, cenats.NatsOptions())
+	if err != nil {
+		log.Fatalf("failed to create nats protocol: %v", err)
+	}
+
+	defer consumer.Close(ctx)
+
+	client, err := cloudevents.NewClient(consumer)
+	if err != nil {
+		log.Fatalf("failed to create cloudevent client: %v", err)
+	}
+
+	for {
+		err = client.StartReceiver(ctx, c.pullFromNats)
+		if err != nil {
+			log.Fatalf("failed to start cloudevent receiver: %v", err)
+		}
+	}
+}
+
+func (c *Config) pullFromNats(_ context.Context, event cloudevents.Event) {
+	client, err := cloudevents.NewClientHTTP()
+	if err != nil {
+		log.Fatalf("failed to create client: %v", err)
+	}
+
+	ctx := cloudevents.ContextWithTarget(context.Background(), c.Target.Host)
+
+	client.Send(ctx, event)
 
 }
