@@ -18,7 +18,8 @@
 				"go.gopath": "/go"
 			},
 			"extensions": [
-				"golang.go"
+				"golang.go",
+				"ms-azuretools.vscode-docker"
 			]
 		}
 	},
