@@ -4,6 +4,9 @@ nats:
   auth:
     seed: somesecretseed
     nkey: publicnkeyuser
+  types:
+    - com.example.type.1
+    - com.example.type.2
 target:
   host: example.com
   #auth: Need to look into how to handle this config, prefer jwt
