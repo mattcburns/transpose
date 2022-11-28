@@ -1,11 +1,11 @@
 version: "3.9"
-service:
+services:
   app:
     image: mcr.microsoft.com/devcontainers/go:0-1-bullseye
     volumes:
       - ../:/workspaces/app:cached
     command: /bin/sh -c "while sleep 1000; do :; done"
-    network_mode: service:another-service
+    network_mode: service:nats
   nats:
     image: nats:2.9-linux
   

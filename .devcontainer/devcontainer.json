@@ -1,5 +1,6 @@
 {
 	"name": "transpose",
+	"forwardPorts": [80],
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/app",

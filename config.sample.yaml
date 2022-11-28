@@ -7,6 +7,8 @@ nats:
   types:
     - com.example.type.1
     - com.example.type.2
+  jetstream:
+    stream: exampleJetstream #just tossing this in here as a note to self
 target:
   host: example.com
   #auth: Need to look into how to handle this config, prefer jwt
