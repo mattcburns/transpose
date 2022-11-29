@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -59,9 +60,9 @@ func parseConfigurationFile() (Config, bool) {
 	}
 
 	if config.Target.Host == "" {
-		return config, true
-	} else {
 		return config, false
+	} else {
+		return config, true
 	}
 }
 
@@ -75,6 +76,7 @@ func (c *Config) notarget() {
 		log.Fatalf("failed to create client: %v", err)
 	}
 
+	fmt.Println("Starting the receiver...")
 	err = client.StartReceiver(context.Background(), c.pushToNATS)
 	if err != nil {
 		log.Fatalf("failed to start receiver: %v", err)
@@ -82,6 +84,7 @@ func (c *Config) notarget() {
 }
 
 func (c *Config) pushToNATS(event cloudevents.Event) {
+	fmt.Println("Received event: ", event)
 	sender, err := cenats.NewSender(c.NATS.Host, c.NATS.Subject, cenats.NatsOptions())
 	if err != nil {
 		log.Fatalf("Failed to create nats protocol: %v", err)
@@ -93,7 +96,10 @@ func (c *Config) pushToNATS(event cloudevents.Event) {
 		log.Fatalf("Failed to create cloudevent client: %v", err)
 	}
 
-	client.Send(context.Background(), event)
+	result := client.Send(context.Background(), event)
+	if cloudevents.IsUndelivered(result) {
+		log.Fatalf("Failed to send cloudevent: %v", result)
+	}
 }
 
 // fromNATS
