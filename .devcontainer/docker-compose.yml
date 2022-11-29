@@ -8,4 +8,3 @@ services:
     network_mode: service:nats
   nats:
     image: nats:2.9-linux
-  
