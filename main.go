@@ -84,7 +84,6 @@ func (c *Config) notarget() {
 }
 
 func (c *Config) pushToNATS(event cloudevents.Event) {
-	fmt.Println("Received event: ", event)
 	sender, err := cenats.NewSender(c.NATS.Host, c.NATS.Subject, cenats.NatsOptions())
 	if err != nil {
 		log.Fatalf("Failed to create nats protocol: %v", err)
@@ -137,5 +136,4 @@ func (c *Config) pullFromNats(_ context.Context, event cloudevents.Event) {
 	ctx := cloudevents.ContextWithTarget(context.Background(), c.Target.Host)
 
 	client.Send(ctx, event)
-
 }
