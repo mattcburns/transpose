@@ -35,18 +35,13 @@ type Config struct {
 }
 
 func main() {
-	config, target := parseConfigurationFile()
-	if target {
-		config.target()
-	} else {
-		config.notarget()
-	}
+	parseConfigurationFile()
 }
 
 // Parse out the configuration file
 // Determine which mode we're going to be running
 
-func parseConfigurationFile() (Config, bool) {
+func parseConfigurationFile() {
 	contents, err := os.ReadFile("config.yaml")
 	if err != nil {
 		log.Fatalf("Unable to read config file: %v", err)
@@ -60,9 +55,9 @@ func parseConfigurationFile() (Config, bool) {
 	}
 
 	if config.Target.Host == "" {
-		return config, false
+		config.notarget()
 	} else {
-		return config, true
+		config.target()
 	}
 }
 
