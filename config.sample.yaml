@@ -2,8 +2,7 @@ nats:
   host: example.com
   subject: exampleSubject
   auth:
-    seed: somesecretseed
-    nkey: publicnkeyuser
+    seed_path: /somesecretseed.txt
   types:
     - com.example.type.1
     - com.example.type.2

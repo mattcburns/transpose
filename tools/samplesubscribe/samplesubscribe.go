@@ -14,6 +14,7 @@ import (
 
 func main() {
 
+	// Don't need waitgroup, refer to this for refactor https://github.com/cloudevents/sdk-go/blob/main/samples/nats/message-interoperability/main.go
 	wg := new(sync.WaitGroup)
 
 	wg.Add(1)

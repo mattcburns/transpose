@@ -10,23 +10,23 @@ import (
 
 	cenats "github.com/cloudevents/sdk-go/protocol/nats/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/nats-io/nats.go"
 )
 
 type NatsAuth struct {
-	Seed string `yaml:"seed"`
-	NKey string `yaml:"nkey"`
+	SeedPath string `yaml:"seed_path"`
 }
 
 type NATSConfig struct {
 	Host    string   `yaml:"host"`
-	Auth    NatsAuth `yaml:"auth,omitempty"`
+	Auth    NatsAuth `yaml:"auth"`
 	Subject string   `yaml:"subject"`
-	Types   []string `yaml:"types,omitempty"`
+	Types   []string `yaml:"types"`
 }
 
 type TargetConfig struct {
 	Host string      `yaml:"host"`
-	Auth interface{} `yaml:"auth,omitempty"`
+	Auth interface{} `yaml:"auth"`
 }
 
 type Config struct {
@@ -79,7 +79,14 @@ func (c *Config) notarget() {
 }
 
 func (c *Config) pushToNATS(event cloudevents.Event) {
-	sender, err := cenats.NewSender(c.NATS.Host, c.NATS.Subject, cenats.NatsOptions())
+
+	opts := cenats.NatsOptions()
+
+	if c.NATS.Auth.SeedPath != "" {
+		opts = append(opts, c.secureNATSOption())
+	}
+
+	sender, err := cenats.NewSender(c.NATS.Host, c.NATS.Subject, opts)
 	if err != nil {
 		log.Fatalf("Failed to create nats protocol: %v", err)
 	}
@@ -102,7 +109,13 @@ func (c *Config) pushToNATS(event cloudevents.Event) {
 func (c *Config) target() {
 	ctx := context.Background()
 
-	consumer, err := cenats.NewConsumer(c.NATS.Host, c.NATS.Subject, cenats.NatsOptions())
+	opts := cenats.NatsOptions()
+
+	if c.NATS.Auth.SeedPath != "" {
+		opts = append(opts, c.secureNATSOption())
+	}
+
+	consumer, err := cenats.NewConsumer(c.NATS.Host, c.NATS.Subject, opts)
 	if err != nil {
 		log.Fatalf("failed to create nats protocol: %v", err)
 	}
@@ -131,4 +144,13 @@ func (c *Config) pullFromNats(_ context.Context, event cloudevents.Event) {
 	ctx := cloudevents.ContextWithTarget(context.Background(), c.Target.Host)
 
 	client.Send(ctx, event)
+}
+
+func (c *Config) secureNATSOption() nats.Option {
+	nkey, err := nats.NkeyOptionFromSeed(c.NATS.Auth.SeedPath)
+	if err != nil {
+		log.Fatalf("Failed to parse nkey seed: %v", err)
+	}
+
+	return nkey
 }
